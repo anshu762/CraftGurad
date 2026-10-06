@@ -9,7 +9,7 @@ export default {
         charcoal: '#2A2520',   // dark charcoal typography
         clay: '#8C5A42',       // muted natural textile tone
         indigo: '#3B4A5A',     // kasuti thread tone
-        terracotta: '#A3432F', // restrained accent
+        terracotta: '#C67B5E', // restrained accent
         line: '#DDD3C2',       // thin borders
         mute: '#6E645A',
       },
