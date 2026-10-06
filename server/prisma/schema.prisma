@@ -1,0 +1,374 @@
+// server/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PUBLIC_VISITOR
+  BUYER
+  ARTISAN
+  EDITOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  AVAILABLE
+  OFFER_PENDING
+  OFFER_ACCEPTED
+  RESERVED
+  SOLD
+  ARCHIVED
+}
+
+enum OfferStatus {
+  PENDING
+  VIEWED
+  COUNTERED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  EXPIRED
+  COMPLETED
+}
+
+enum ConsentStatus {
+  PENDING
+  GRANTED
+  DENIED
+  REVOKED
+  EXPIRED
+}
+
+enum CraftType {
+  KASUTI
+  ILKAL
+}
+
+enum NotificationType {
+  NEW_OFFER
+  OFFER_ACCEPTED
+  OFFER_REJECTED
+  OFFER_COUNTERED
+  OFFER_EXPIRED
+  PRODUCT_RESERVED
+  PRODUCT_SOLD
+  SYSTEM
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  role          UserRole  @default(BUYER)
+  isActive      Boolean   @default(true)
+  emailVerified Boolean   @default(false)
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  artisanProfile ArtisanProfile?
+  offers         Offer[]
+  offerEvents    OfferEvent[]
+  auditLogs      AuditLog[]
+  notifications  Notification[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model ArtisanProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  displayName       String
+  location          String
+  biography         String?  @db.Text
+  craftAssociation  CraftType
+  portraitUrl       String?
+  quote             String?  @db.Text
+  quoteApproved     Boolean  @default(false)
+  profileVisible    Boolean  @default(false)
+  contactVisible    Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products        Product[]
+  consentRecords  ConsentRecord[]
+
+  @@index([craftAssociation])
+  @@index([profileVisible])
+}
+
+model Craft {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  type        CraftType @unique
+  description String?   @db.Text
+  heroImageUrl String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  stories  Story[]
+  products Product[]
+}
+
+model Story {
+  id              String    @id @default(uuid())
+  title           String
+  slug            String    @unique
+  craftId         String
+  craftType       CraftType
+  subtitle        String?
+  introduction    String?   @db.Text
+  heroMediaUrl    String?
+  heroMediaAlt    String?
+  seoTitle        String?
+  seoDescription  String?   @db.Text
+  isPublished     Boolean   @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  craft    Craft          @relation(fields: [craftId], references: [id])
+  sections StorySection[]
+
+  @@index([slug])
+  @@index([craftType])
+  @@index([isPublished])
+}
+
+model StorySection {
+  id              String   @id @default(uuid())
+  storyId         String
+  sectionNumber   Int
+  sectionLabel    String?
+  heading         String
+  bodyText        String?  @db.Text
+  primaryImageUrl String?
+  primaryImageAlt String?
+  secondaryImageUrl String?
+  secondaryImageAlt String?
+  imageCaption    String?
+  quote           String?  @db.Text
+  quoteAttribution String?
+  audioUrl        String?
+  displayOrder    Int      @default(0)
+  isPublished     Boolean  @default(false)
+  layoutType      String   @default("standard")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@index([storyId])
+  @@index([displayOrder])
+}
+
+model Product {
+  id                String        @id @default(uuid())
+  name              String
+  slug              String        @unique
+  craftId           String
+  craftType         CraftType
+  artisanId         String?
+  description       String?       @db.Text
+  story             String?       @db.Text
+  material          String?
+  technique         String?
+  motif             String?
+  dimensions        String?
+  color             String?
+  approxMakingTime  String?
+  origin            String?
+  price             Decimal       @db.Decimal(10, 2)
+  reservePrice      Decimal?      @db.Decimal(10, 2)
+  currency          String        @default("INR")
+  status            ProductStatus @default(DRAFT)
+  isFeatured        Boolean       @default(false)
+  provenance        String?       @db.Text
+  shippingInfo      String?       @db.Text
+  seoTitle          String?
+  seoDescription    String?       @db.Text
+  makerVisibility   Boolean       @default(false)
+  publishedAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  craft    Craft            @relation(fields: [craftId], references: [id])
+  artisan  ArtisanProfile?  @relation(fields: [artisanId], references: [id])
+  images   ProductImage[]
+  offers   Offer[]
+
+  @@index([slug])
+  @@index([craftType])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([artisanId])
+}
+
+model ProductImage {
+  id            String   @id @default(uuid())
+  productId     String
+  imageUrl      String
+  thumbnailUrl  String?
+  altText       String?
+  caption       String?
+  isPrimary     Boolean  @default(false)
+  displayOrder  Int      @default(0)
+  width         Int?
+  height        Int?
+  fileSize      Int?
+  mimeType      String?
+  createdAt     DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([isPrimary])
+}
+
+model MediaAsset {
+  id               String   @id @default(uuid())
+  originalFilename String
+  storageKey       String   @unique
+  mimeType         String
+  width            Int?
+  height           Int?
+  fileSize         Int
+  altText          String?
+  caption          String?
+  photographerCredit String?
+  usageRights      String?
+  consentRequired  Boolean  @default(false)
+  focalPointX      Float?   @default(50)
+  focalPointY      Float?   @default(50)
+  isPublic         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([storageKey])
+}
+
+model Offer {
+  id              String      @id @default(uuid())
+  productId       String
+  buyerId         String?
+  buyerName       String
+  buyerEmail      String
+  buyerPhone      String
+  originalAmount  Decimal     @db.Decimal(10, 2)
+  currentAmount   Decimal     @db.Decimal(10, 2)
+  currency        String      @default("INR")
+  status          OfferStatus @default(PENDING)
+  message         String?     @db.Text
+  preferredContact String?
+  shippingLocation String?
+  consentGiven    Boolean     @default(false)
+  termsAccepted   Boolean     @default(false)
+  expiresAt       DateTime?
+  ipAddress       String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  product Product      @relation(fields: [productId], references: [id])
+  buyer   User?        @relation(fields: [buyerId], references: [id])
+  events  OfferEvent[]
+
+  @@index([productId])
+  @@index([status])
+  @@index([buyerEmail])
+  @@index([createdAt])
+}
+
+model OfferEvent {
+  id          String      @id @default(uuid())
+  offerId     String
+  status      OfferStatus
+  amount      Decimal?    @db.Decimal(10, 2)
+  message     String?     @db.Text
+  actionedBy  String?
+  createdAt   DateTime    @default(now())
+
+  offer  Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  user   User? @relation(fields: [actionedBy], references: [id])
+
+  @@index([offerId])
+  @@index([createdAt])
+}
+
+model ConsentRecord {
+  id             String        @id @default(uuid())
+  artisanId      String
+  consentType    String
+  status         ConsentStatus @default(PENDING)
+  consentDate    DateTime?
+  obtainedBy     String?
+  restrictions   String?       @db.Text
+  expiryDate     DateTime?
+  notes          String?       @db.Text
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  artisan ArtisanProfile @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+
+  @@index([artisanId])
+  @@index([status])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  data      Json?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  entity     String
+  entityId   String?
+  oldData    Json?
+  newData    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
