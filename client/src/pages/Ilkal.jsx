@@ -9,7 +9,7 @@ import RelatedProductsPreview from '../components/editorial/RelatedProductsPrevi
 import StoryNavigation from '../components/editorial/StoryNavigation.jsx';
 import StoryProgress from '../components/editorial/StoryProgress.jsx';
 import useDocumentTitle from '../hooks/useDocumentTitle.js';
-import { IMAGES } from '../utils/images.js';
+import { IMAGES } from '../lib/images.js';
 
 export default function Ilkal() {
   useDocumentTitle(

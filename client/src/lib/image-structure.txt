@@ -1,0 +1,26 @@
+client/public/images/
+├── home/
+│   ├── hero-main.jpg
+│   ├── documentary-wide-1.jpg
+│   ├── kasuti-ilkal-intro.jpg
+│   ├── artisan-portrait-1.jpg
+│   ├── kasuti-teaser.jpg
+│   ├── ilkal-teaser.jpg
+│   ├── kasuti-process.jpg
+│   └── ilkal-process.jpg
+├── kasuti/
+│   ├── opening.jpg
+│   ├── origin.jpg
+│   ├── making-1.jpg
+│   ├── making-2.jpg
+│   ├── materials.jpg
+│   ├── artisan.jpg
+│   ├── challenge.jpg
+│   ├── collection.jpg
+│   └── closing.jpg
+├── ilkal/
+│   └── (same 9 filenames as kasuti/)
+└── about/
+    ├── documentary.jpg
+    ├── dhruti.jpg
+    └── consent.jpg

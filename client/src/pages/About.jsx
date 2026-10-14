@@ -3,7 +3,7 @@ import StoryIntro from '../components/editorial/StoryIntro.jsx';
 import EditorialSection from '../components/editorial/EditorialSection.jsx';
 import PullQuote from '../components/editorial/PullQuote.jsx';
 import useDocumentTitle from '../hooks/useDocumentTitle.js';
-import { IMAGES } from '../utils/images.js';
+import { IMAGES } from '../lib/images.js';
 
 export default function About() {
   useDocumentTitle(
@@ -62,7 +62,7 @@ export default function About() {
 
       <section className="bg-charcoal text-cream py-24 px-5 md:px-8 text-center">
         <p className="eyebrow !text-cream/70 mb-4">Get in touch</p>
-        <h2 className="font-serif text-3xl md:text-5xl mb-8 max-w-2xl mx-auto">
+        <h2 className="font-serif text-3xl text-cream md:text-5xl mb-8 max-w-2xl mx-auto">
           Questions about the project, consent, or collaboration?
         </h2>
         <Link

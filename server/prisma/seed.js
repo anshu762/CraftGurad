@@ -1,31 +1,86 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.craft.upsert({
-    where: { type: 'KASUTI' },
+  await prisma.craft.upsert({ where: { type: 'KASUTI' }, update: {}, create: { type: 'KASUTI', title: 'Kasuti' } });
+  await prisma.craft.upsert({ where: { type: 'ILKAL' }, update: {}, create: { type: 'ILKAL', title: 'Ilkal' } });
+
+  const passwordHash = await bcrypt.hash('Password123', 10);
+
+  await prisma.user.upsert({
+    where: { email: 'admin@craftguard.test' },
     update: {},
-    create: { type: 'KASUTI', title: 'Kasuti' },
+    create: { email: 'admin@craftguard.test', name: 'CraftGuard Admin', passwordHash, role: 'ADMIN' },
   });
-  await prisma.craft.upsert({
-    where: { type: 'ILKAL' },
+
+  const artisanUser = await prisma.user.upsert({
+    where: { email: 'artisan@craftguard.test' },
     update: {},
-    create: { type: 'ILKAL', title: 'Ilkal' },
+    create: { email: 'artisan@craftguard.test', name: 'Test Artisan', passwordHash, role: 'ARTISAN' },
   });
-  console.log('✓ Seed complete: Kasuti and Ilkal craft records created.');
+
+  await prisma.user.upsert({
+    where: { email: 'buyer@craftguard.test' },
+    update: {},
+    create: { email: 'buyer@craftguard.test', name: 'Test Buyer', passwordHash, role: 'BUYER' },
+  });
+
+  const artisanProfile = await prisma.artisanProfile.upsert({
+    where: { userId: artisanUser.id },
+    update: {},
+    create: {
+      userId: artisanUser.id,
+      publicDisplayName: 'Test Artisan',
+      location: 'Karnataka',
+      biography: 'A demonstration artisan profile used for development and testing.',
+      craftAssociation: 'KASUTI',
+      profileVisibility: true,
+      contactVisibility: false,
+      consentStatus: 'GRANTED',
+    },
+  });
+
+  const products = [
+    { name: 'Kasuti Temple Motif Dupatta', slug: 'kasuti-temple-motif-dupatta', craft: 'KASUTI', description: 'A hand-embroidered dupatta featuring traditional temple tower motifs, stitched using counted-thread Kasuti technique.', story: 'This piece was stitched over three weeks using the Gavanti and Murgi stitches, passed down through a family practice of Kasuti embroidery.', material: 'Cotton with silk thread embroidery', technique: 'Kasuti hand embroidery', motif: 'Temple tower (Gopura)', dimensions: '2.5m x 1m', colour: 'Deep red with cream embroidery', makingTimeApprox: '3 weeks', origin: 'Karnataka', price: 8500, status: 'AVAILABLE', featured: true, provenance: 'Documented directly with the artisan as part of the CraftGuard archive.', shippingInfo: 'Ships within 5-7 business days, carefully packaged.' },
+    { name: 'Kasuti Geometric Border Saree', slug: 'kasuti-geometric-border-saree', craft: 'KASUTI', description: 'A handwoven cotton saree finished with a geometric Kasuti embroidered border.', story: 'The geometric border motifs on this saree reflect a pattern vocabulary built over generations.', material: 'Handwoven cotton, silk thread border', technique: 'Kasuti hand embroidery', motif: 'Geometric repeat pattern', dimensions: 'Standard saree, 5.5m', colour: 'Indigo with gold embroidery', makingTimeApprox: '4 weeks', origin: 'Karnataka', price: 12500, status: 'AVAILABLE', featured: false, provenance: 'Documented directly with the artisan as part of the CraftGuard archive.', shippingInfo: 'Ships within 5-7 business days, carefully packaged.' },
+    { name: 'Kasuti Floral Blouse Piece', slug: 'kasuti-floral-blouse-piece', craft: 'KASUTI', description: 'A floral motif Kasuti embroidered blouse piece in fine cotton.', story: 'A smaller-scale piece showcasing floral Kasuti motifs, ideal for a tailored blouse.', material: 'Cotton with cotton thread embroidery', technique: 'Kasuti hand embroidery', motif: 'Floral repeat', dimensions: '1m x 0.8m', colour: 'Cream with multicolor floral thread', makingTimeApprox: '1.5 weeks', origin: 'Karnataka', price: 3200, status: 'OFFER_PENDING', featured: false, provenance: 'Documented directly with the artisan as part of the CraftGuard archive.', shippingInfo: 'Ships within 5-7 business days, carefully packaged.' },
+    { name: 'Kasuti Chariot Motif Wall Hanging', slug: 'kasuti-chariot-motif-wall-hanging', craft: 'KASUTI', description: 'A framed Kasuti embroidered wall hanging featuring the traditional chariot (rath) motif.', story: 'This piece was commissioned as a documentation sample and has since found a home.', material: 'Cotton, silk thread, wooden frame', technique: 'Kasuti hand embroidery', motif: 'Chariot (Rath)', dimensions: '40cm x 40cm framed', colour: 'Maroon with gold thread', makingTimeApprox: '2 weeks', origin: 'Karnataka', price: 4500, status: 'SOLD', featured: false, provenance: 'Documented directly with the artisan as part of the CraftGuard archive.', shippingInfo: 'No longer available for shipping — archived for documentation.' },
+    { name: 'Ilkal Traditional Silk Saree', slug: 'ilkal-traditional-silk-saree', craft: 'ILKAL', description: 'A handwoven Ilkal silk saree with a traditional contrast pallu woven using the tope teni technique.', story: 'Woven on a pit loom over two weeks, this saree reflects the distinct Ilkal weaving identity.', material: 'Silk body, cotton-silk blend pallu', technique: 'Ilkal handloom weaving (tope teni)', motif: 'Temple tower pallu border', dimensions: 'Standard saree, 6m', colour: 'Maroon body with green pallu', makingTimeApprox: '2 weeks', origin: 'Ilkal, Karnataka', price: 15500, status: 'AVAILABLE', featured: true, provenance: 'Documented directly with the weaving family as part of the CraftGuard archive.', shippingInfo: 'Ships within 5-7 business days, carefully packaged.' },
+    { name: 'Ilkal Cotton Everyday Saree', slug: 'ilkal-cotton-everyday-saree', craft: 'ILKAL', description: 'A lightweight, handwoven Ilkal cotton saree suited for everyday wear.', story: 'A simpler, everyday weave, made using the same pit-loom technique as ceremonial pieces.', material: 'Handwoven cotton', technique: 'Ilkal handloom weaving', motif: 'Simple contrast border', dimensions: 'Standard saree, 5.5m', colour: 'Yellow with red border', makingTimeApprox: '1.5 weeks', origin: 'Ilkal, Karnataka', price: 4200, status: 'AVAILABLE', featured: false, provenance: 'Documented directly with the weaving family as part of the CraftGuard archive.', shippingInfo: 'Ships within 5-7 business days, carefully packaged.' },
+    { name: 'Ilkal Temple Border Pallu Saree', slug: 'ilkal-temple-border-pallu-saree', craft: 'ILKAL', description: 'An Ilkal saree with a richly woven temple-tower pallu border.', story: 'The temple-tower pallu motif is one of the most recognizable signatures of Ilkal weaving.', material: 'Cotton-silk blend', technique: 'Ilkal handloom weaving (tope teni)', motif: 'Temple tower pallu', dimensions: 'Standard saree, 6m', colour: 'Black body with red pallu', makingTimeApprox: '2.5 weeks', origin: 'Ilkal, Karnataka', price: 9800, status: 'OFFER_PENDING', featured: false, provenance: 'Documented directly with the weaving family as part of the CraftGuard archive.', shippingInfo: 'Ships within 5-7 business days, carefully packaged.' },
+    { name: 'Ilkal Heritage Weave Saree', slug: 'ilkal-heritage-weave-saree', craft: 'ILKAL', description: 'A vintage-style Ilkal weave, documented as part of the CraftGuard heritage archive.', story: 'This piece represents an older weaving pattern increasingly rare among active weavers.', material: 'Pure silk', technique: 'Ilkal handloom weaving', motif: 'Heritage pattern pallu', dimensions: 'Standard saree, 6m', colour: 'Deep green with gold pallu', makingTimeApprox: '3 weeks', origin: 'Ilkal, Karnataka', price: 18500, status: 'SOLD', featured: false, provenance: 'Documented directly with the weaving family as part of the CraftGuard archive.', shippingInfo: 'No longer available for shipping — archived for documentation.' },
+  ];
+
+  for (const p of products) {
+    await prisma.product.upsert({
+      where: { slug: p.slug },
+      update: {},
+      create: {
+        ...p,
+        currency: 'INR',
+        published: true,
+        makerVisible: true,
+        artisanId: artisanProfile.id,
+        images: {
+          create: [
+            { altText: `${p.name} — full view`, displayOrder: 0, mediaAsset: { create: { originalFilename: `${p.slug}-1.jpg`, storageKey: `pending/${p.slug}-1.jpg`, mimeType: 'image/jpeg', altText: `${p.name} — full view`, uploadStatus: 'PENDING' } } },
+            { altText: `${p.name} — detail view`, displayOrder: 1, mediaAsset: { create: { originalFilename: `${p.slug}-2.jpg`, storageKey: `pending/${p.slug}-2.jpg`, mimeType: 'image/jpeg', altText: `${p.name} — detail view`, uploadStatus: 'PENDING' } } },
+          ],
+        },
+      },
+    });
+  }
+
+  console.log('✓ Seed complete.');
+  console.log('  Test accounts (password: Password123): admin@craftguard.test / artisan@craftguard.test / buyer@craftguard.test');
+  console.log(`  ✓ ${products.length} sample products created (Kasuti + Ilkal, mixed availability).`);
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
-
-
-
+  .catch((e) => { console.error(e); process.exit(1); })
+  .finally(async () => { await prisma.$disconnect(); });
 
 
 

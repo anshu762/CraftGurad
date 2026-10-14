@@ -6,26 +6,21 @@ const THEME_PATTERNS = {
   neutral: { base: '#EDE6DA', accent: '#A3432F', icon: '📷' },
 };
 
-/**
- * Responsive image with graceful fallback.
- * If `src` is missing, or the image fails to load, renders a branded,
- * on-theme placeholder instead of a broken-image icon or blank box.
- */
 export default function ResponsiveImage({
-  src,
-  alt,
-  aspect = '4/5',
-  theme = 'neutral',
-  label,
-  priority = false,
-  fill = false,
-  className = '',
+  src, alt, aspect = '4/5', theme = 'neutral', label, priority = false, fill = false, className = '',
 }) {
   const [errored, setErrored] = useState(!src);
   const pattern = THEME_PATTERNS[theme] || THEME_PATTERNS.neutral;
 
   const sizingClass = fill ? 'absolute inset-0 w-full h-full' : 'w-full';
   const sizingStyle = fill ? {} : { aspectRatio: aspect };
+
+  function handleError() {
+    if (import.meta.env.DEV) {
+      console.warn(`[ResponsiveImage] Failed to load: "${src}" — check that this exact file exists in client/public${src}`);
+    }
+    setErrored(true);
+  }
 
   if (errored) {
     return (
@@ -56,7 +51,7 @@ export default function ResponsiveImage({
       loading={priority ? 'eager' : 'lazy'}
       fetchpriority={priority ? 'high' : 'auto'}
       decoding="async"
-      onError={() => setErrored(true)}
+      onError={handleError}
       className={`${sizingClass} object-cover ${className}`}
       style={sizingStyle}
     />

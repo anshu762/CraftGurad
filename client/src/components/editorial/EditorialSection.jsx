@@ -1,127 +1,76 @@
+import ResponsiveImage from '../media/ResponsiveImage.jsx';
+
 /**
- * Enhanced EditorialSection with better animations and layout options
- * variants: 'image-left' | 'image-right' | 'full-bleed' | 'text-only' | 'split'
+ * variants: 'image-left' | 'image-right' | 'full-bleed' | 'text-only'
  */
 export default function EditorialSection({
   eyebrow,
   heading,
   body,
   image,
-  imageAlt,
   variant = 'image-right',
   caption,
   className = '',
-  reverse = false,
 }) {
-  // Full bleed variant
   if (variant === 'full-bleed') {
     return (
       <section className={`my-20 md:my-32 ${className}`}>
-        <figure 
-          className="relative"
-          data-aos="fade-up"
-          data-aos-duration="1200"
-        >
-          <div className="overflow-hidden">
-            <img 
-              src={image} 
-              alt={imageAlt} 
-              className="w-full h-[60vh] md:h-[85vh] object-cover transform hover:scale-105 transition-transform duration-1000" 
-              loading="lazy" 
-            />
-          </div>
-          {caption && (
-            <figcaption className="text-xs text-mute mt-4 px-5 md:px-8 tracking-wide">
-              {caption}
-            </figcaption>
-          )}
+        <figure className="relative overflow-hidden" data-aos="fade-up" data-aos-duration="1200">
+          <ResponsiveImage
+            src={image.src}
+            alt={image.alt}
+            theme={image.theme}
+            label={image.label}
+            aspect="21/9"
+            className="h-[60vh] md:h-[85vh] transform hover:scale-105 transition-transform duration-1000"
+          />
+          {caption && <figcaption className="text-xs text-mute mt-4 px-5 md:px-8 tracking-wide">{caption}</figcaption>}
         </figure>
       </section>
     );
   }
 
-  // Text only variant
   if (variant === 'text-only') {
     return (
       <section className={`my-20 md:my-32 px-5 md:px-8 ${className}`}>
-        <div 
-          className="max-w-prose mx-auto text-center"
-          data-aos="fade-up"
-          data-aos-duration="1000"
-        >
-          {eyebrow && (
-            <p className="eyebrow mb-4 !text-terracotta tracking-widest">
-              {eyebrow}
-            </p>
-          )}
-          {heading && (
-            <h2 className="text-4xl md:text-5xl lg:text-6xl mb-8 font-serif leading-tight">
-              {heading}
-            </h2>
-          )}
-          {body && (
-            <p className="text-lg md:text-xl leading-relaxed text-charcoal/80 font-light">
-              {body}
-            </p>
-          )}
+        <div className="max-w-prose mx-auto text-center" data-aos="fade-up" data-aos-duration="1000">
+          {eyebrow && <p className="eyebrow mb-4 !text-terracotta tracking-widest">{eyebrow}</p>}
+          {heading && <h2 className="text-4xl md:text-5xl lg:text-6xl mb-8 font-serif leading-tight">{heading}</h2>}
+          {body && <p className="text-lg md:text-xl leading-relaxed text-charcoal/80 font-light">{body}</p>}
         </div>
       </section>
     );
   }
 
-  // Split layout
-  const imageFirst = variant === 'image-left' || (!reverse && variant !== 'image-right');
+  const imageFirst = variant === 'image-left';
 
   return (
     <section className={`my-20 md:my-32 px-5 md:px-8 ${className}`}>
       <div className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-        {/* Image */}
-        <div
-          className={`${imageFirst ? 'md:order-1' : 'md:order-2'}`}
-          data-aos={imageFirst ? 'fade-right' : 'fade-left'}
-          data-aos-duration="1200"
-        >
+        <div className={imageFirst ? 'md:order-1' : 'md:order-2'} data-aos={imageFirst ? 'fade-right' : 'fade-left'} data-aos-duration="1200">
           <div className="overflow-hidden relative group">
-            <img 
-              src={image} 
-              alt={imageAlt} 
-              className="w-full h-[55vh] md:h-[75vh] object-cover transform group-hover:scale-105 transition-transform duration-1000" 
-              loading="lazy" 
+            <ResponsiveImage
+              src={image.src}
+              alt={image.alt}
+              theme={image.theme}
+              label={image.label}
+              aspect="4/5"
+              className="h-[55vh] md:h-[75vh] transform group-hover:scale-105 transition-transform duration-1000"
             />
-            <div className="absolute inset-0 bg-terracotta/0 group-hover:bg-terracotta/10 transition-colors duration-700" />
+            <div className="absolute inset-0 bg-terracotta/0 group-hover:bg-terracotta/10 transition-colors duration-700 pointer-events-none" />
           </div>
-          {caption && (
-            <p className="text-xs text-mute mt-4 tracking-wide">{caption}</p>
-          )}
+          {caption && <p className="text-xs text-mute mt-4 tracking-wide">{caption}</p>}
         </div>
 
-        {/* Content */}
-        <div 
-          className={`${imageFirst ? 'md:order-2' : 'md:order-1'}`}
-          data-aos="fade-up"
-          data-aos-duration="1000"
-        >
-          {eyebrow && (
-            <p className="eyebrow mb-4 !text-terracotta tracking-widest">
-              {eyebrow}
-            </p>
-          )}
-          {heading && (
-            <h2 className="text-4xl md:text-5xl mb-8 font-serif leading-tight">
-              {heading}
-            </h2>
-          )}
-          {body && (
-            <p className="text-lg md:text-xl leading-relaxed text-charcoal/80 font-light">
-              {body}
-            </p>
-          )}
+        <div className={imageFirst ? 'md:order-2' : 'md:order-1'} data-aos="fade-up" data-aos-duration="1000">
+          {eyebrow && <p className="eyebrow mb-4 !text-terracotta tracking-widest">{eyebrow}</p>}
+          {heading && <h2 className="text-4xl md:text-5xl mb-8 font-serif leading-tight">{heading}</h2>}
+          {body && <p className="text-lg md:text-xl leading-relaxed text-charcoal/80 font-light">{body}</p>}
         </div>
       </div>
     </section>
   );
 }
-
 
 
 
