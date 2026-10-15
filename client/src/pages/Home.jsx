@@ -156,7 +156,7 @@ export default function Home() {
               to="/gallery"
               className="text-sm uppercase tracking-widest border-b border-charcoal pb-2 hover:text-terracotta hover:border-terracotta transition-all duration-500 hidden md:block"
             >
-              View full gallery →
+              View full product catalog →
             </Link>
           </div>
 
@@ -167,7 +167,7 @@ export default function Home() {
               to="/gallery"
               className="inline-block px-8 py-3 bg-charcoal text-cream text-sm uppercase tracking-widest hover:bg-terracotta transition-colors duration-500"
             >
-              View full gallery
+              View full product catalog
             </Link>
           </div>
         </div>

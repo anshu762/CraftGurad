@@ -16,7 +16,7 @@ export const IMAGES = {
   ilkalProcess: { src: '/images/home/ilkal-process.jpeg', alt: "Weaver's hands working an Ilkal saree on a traditional loom", theme: 'ilkal', label: 'Process photograph pending' },
 
   // ---------- Kasuti story page ----------
-  kasutiOpening: { src: '/images/kasuti/opening.jpeg', alt: 'Kasuti work in progress on handwoven cotton', theme: 'kasuti', label: 'Opening photograph pending' },
+  kasutiOpening: { src: '/images/kasuti/opening.webp', alt: 'Kasuti work in progress on handwoven cotton', theme: 'kasuti', label: 'Opening photograph pending' },
   kasutiOrigin: { src: '/images/kasuti/origin.jpeg', alt: 'Traditional Kasuti motifs on fabric', theme: 'kasuti', label: 'Origin photograph pending' },
   kasutiMaking1: { src: '/images/kasuti/making-1.jpeg', alt: 'Close-up of Kasuti stitching technique, side one', theme: 'kasuti', label: 'Process photograph pending', caption: 'Counting threads before each stitch.' },
   kasutiMaking2: { src: '/images/kasuti/making-2.webp', alt: 'Close-up of Kasuti stitching technique, side two', theme: 'kasuti', label: 'Process photograph pending', caption: 'A completed motif section.' },

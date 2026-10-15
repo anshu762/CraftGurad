@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useCart from '../hooks/useCart.js';
 import useToast from '../hooks/useToast.js';
@@ -5,17 +6,31 @@ import useDocumentTitle from '../hooks/useDocumentTitle.js';
 import Breadcrumbs from '../components/navigation/Breadcrumbs.jsx';
 import CartItemRow from '../components/cart/CartItemRow.jsx';
 import CartSummary from '../components/cart/CartSummary.jsx';
+import CheckoutModal from '../components/cart/CheckoutModal.jsx';
 import EmptyState from '../components/gallery/EmptyState.jsx';
 import PageLoader from '../components/layout/PageLoader.jsx';
 
 export default function Cart() {
   useDocumentTitle('My Cart', 'Review the pieces you plan to make an offer on.');
-  const { cart, loading } = useCart();
+  const { cart, loading, refresh } = useCart();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const [showCheckout, setShowCheckout] = useState(false);
+
+  const readyItems = cart.items.filter((i) => i.product.offerable && i.draftAmount);
 
   function handleSubmit() {
-    showToast('Offer submission will be available in the next update. Your selections are saved.');
+    if (readyItems.length === 0) {
+      showToast('Enter an offer amount for at least one item before submitting.', 'error');
+      return;
+    }
+    setShowCheckout(true);
+  }
+
+  async function handleSuccess() {
+    setShowCheckout(false);
+    showToast('Your offers have been submitted to the artisans.');
+    await refresh();
   }
 
   if (loading) return <PageLoader />;
@@ -49,6 +64,10 @@ export default function Cart() {
           ← Continue Browsing
         </Link>
       </div>
+
+      {showCheckout && (
+        <CheckoutModal items={readyItems} onClose={() => setShowCheckout(false)} onSuccess={handleSuccess} />
+      )}
     </div>
   );
 }

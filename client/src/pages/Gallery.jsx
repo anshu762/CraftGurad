@@ -30,7 +30,7 @@ export default function Gallery() {
     <div className="px-5 md:px-8 py-16 md:py-24 max-w-7xl mx-auto">
       <div className="mb-12 max-w-2xl">
         <p className="eyebrow mb-4">The Archive</p>
-        <h1 className="text-3xl md:text-5xl mb-4">Gallery</h1>
+        <h1 className="text-3xl md:text-5xl mb-4">Products</h1>
         <p className="text-mute">A curated collection of documented Kasuti and Ilkal pieces — each one connected to a maker, a process, and a story.</p>
       </div>
 

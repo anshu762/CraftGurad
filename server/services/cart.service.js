@@ -1,5 +1,6 @@
 import { prisma } from '../utils/prisma.js';
 import { isOfferable, toAvailabilityLabel } from '../utils/productStatus.js';
+import { resolveMediaUrl } from '../utils/media.js';
 
 async function getOrCreateCart(userId) {
   let cart = await prisma.cart.findUnique({ where: { userId } });
@@ -24,9 +25,7 @@ function serializeCartItem(item) {
       currency: product.currency,
       status: toAvailabilityLabel(product.status),
       offerable: isOfferable(product.status),
-      image: image
-        ? { url: image.mediaAsset?.uploadStatus === 'UPLOADED' ? `/media/${image.mediaAsset.storageKey}` : null, altText: image.altText }
-        : null,
+      image: image ? { url: resolveMediaUrl(image.mediaAsset), altText: image.altText } : null,
     },
   };
 }
@@ -55,9 +54,7 @@ export async function addItem(userId, productId) {
   }
 
   const cart = await getOrCreateCart(userId);
-  const existing = await prisma.cartItem.findUnique({
-    where: { cartId_productId: { cartId: cart.id, productId } },
-  });
+  const existing = await prisma.cartItem.findUnique({ where: { cartId_productId: { cartId: cart.id, productId } } });
   if (existing) {
     const err = new Error('This item is already in your cart.');
     err.status = 409;

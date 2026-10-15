@@ -20,9 +20,25 @@ async function request(path, { method = 'GET', body } = {}) {
   return data;
 }
 
+async function uploadRequest(path, formData) {
+  const res = await fetch(`${BASE_URL}${path}`, { method: 'POST', credentials: 'include', body: formData });
+
+  let data = null;
+  try { data = await res.json(); } catch { data = null; }
+
+  if (!res.ok) {
+    const error = new Error(data?.error || 'Something went wrong. Please try again.');
+    error.status = res.status;
+    error.fieldErrors = data?.fieldErrors || null;
+    throw error;
+  }
+  return data;
+}
+
 export const apiClient = {
   get: (path) => request(path),
   post: (path, body) => request(path, { method: 'POST', body }),
   patch: (path, body) => request(path, { method: 'PATCH', body }),
   delete: (path) => request(path, { method: 'DELETE' }),
+  upload: (path, formData) => uploadRequest(path, formData),
 };

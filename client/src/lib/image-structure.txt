@@ -24,3 +24,38 @@ client/public/images/
     ├── documentary.jpg
     ├── dhruti.jpg
     └── consent.jpg
+
+
+    /images/products/
+├── kasuti-temple-motif-dupatta/
+│   ├── hero.jpg
+│   ├── detail.jpg
+│   └── context.jpg
+├── kasuti-geometric-border-saree/
+│   ├── hero.jpg
+│   ├── detail.jpg
+│   └── context.jpg
+├── kasuti-floral-blouse-piece/
+│   ├── hero.jpg
+│   ├── detail.jpg
+│   └── context.jpg
+├── kasuti-chariot-motif-wall-hanging/
+│   ├── hero.jpg
+│   ├── detail.jpg
+│   └── context.jpg
+├── ilkal-traditional-silk-saree/
+│   ├── hero.jpg
+│   ├── detail.jpg
+│   └── context.jpg
+├── ilkal-cotton-everyday-saree/
+│   ├── hero.jpg
+│   ├── detail.jpg
+│   └── context.jpg
+├── ilkal-temple-border-pallu-saree/
+│   ├── hero.jpg
+│   ├── detail.jpg
+│   └── context.jpg
+└── ilkal-heritage-weave-saree/
+    ├── hero.jpg
+    ├── detail.jpg
+    └── context.jpg

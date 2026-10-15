@@ -1,11 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth.js';
 import useDocumentTitle from '../hooks/useDocumentTitle.js';
+import useMyOffers from '../hooks/useMyOffers.js';
+import OfferStatusBadge from '../components/offers/OfferStatusBadge.jsx';
+import { formatINR } from '../lib/format.js';
 
 export default function Account() {
   useDocumentTitle('My Account', 'Manage your CraftGuard account.');
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { items: offers, loading: offersLoading } = useMyOffers();
 
   async function handleLogout() {
     await logout();
@@ -23,10 +27,36 @@ export default function Account() {
         {user.phone && <p><span className="text-mute">Phone:</span> {user.phone}</p>}
         <p><span className="text-mute">Role:</span> {user.role}</p>
       </div>
-      <Link to="/cart" className="inline-block mb-6 text-sm uppercase tracking-wide border-b border-charcoal pb-1 hover:text-terracotta hover:border-terracotta transition-colors">
+      <Link to="/cart" className="inline-block mb-10 text-sm uppercase tracking-wide border-b border-charcoal pb-1 hover:text-terracotta hover:border-terracotta transition-colors">
         View My Cart →
       </Link>
-      <p className="text-sm text-mute mb-6">Offer submission and tracking will be available in the next update.</p>
+
+      <p className="eyebrow mb-4">My Offers</p>
+      {offersLoading ? (
+        <p className="text-sm text-mute mb-10">Loading your offers…</p>
+      ) : offers.length === 0 ? (
+        <p className="text-sm text-mute mb-10">You haven't made any offers yet. Browse the gallery to find a piece you love.</p>
+      ) : (
+        <div className="space-y-4 mb-10">
+          {offers.map((offer) => (
+            <Link
+              key={offer.id}
+              to={`/product/${offer.product.slug}`}
+              className="block border border-line rounded-sm p-4 hover:border-terracotta transition-colors"
+            >
+              <div className="flex items-center justify-between mb-2 gap-3">
+                <span className="font-serif truncate">{offer.product.name}</span>
+                <OfferStatusBadge status={offer.status} />
+              </div>
+              <p className="text-sm text-mute">
+                {formatINR(offer.currentAmount)}
+                {offer.currentAmount !== offer.originalAmount ? ` (originally ${formatINR(offer.originalAmount)})` : ''}
+              </p>
+            </Link>
+          ))}
+        </div>
+      )}
+
       <button onClick={handleLogout} className="border border-charcoal px-6 py-3 text-sm uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors">
         Log Out
       </button>

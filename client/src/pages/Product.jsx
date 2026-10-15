@@ -10,6 +10,8 @@ import GalleryGrid from '../components/gallery/GalleryGrid.jsx';
 import PageLoader from '../components/layout/PageLoader.jsx';
 import NotFound from './NotFound.jsx';
 import { formatINR } from '../lib/format.js';
+import OfferPanel from '../components/product/OfferPanel.jsx';
+
 
 export default function Product() {
   const { slug } = useParams();
@@ -56,6 +58,7 @@ export default function Product() {
           {product.description && <p className="text-base leading-relaxed text-charcoal/90 mb-6">{product.description}</p>}
 
           <ProductActions product={product} />
+          <OfferPanel slug={product.slug} offerable={product.offerable} />
           <ProductMetadata product={product} />
 
           {product.provenance && (
