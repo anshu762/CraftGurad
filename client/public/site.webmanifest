@@ -1,0 +1,12 @@
+{
+  "name": "CraftGuard",
+  "short_name": "CraftGuard",
+  "description": "A living archive of craft, makers and market access.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5EFE6",
+  "theme_color": "#2B2622",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

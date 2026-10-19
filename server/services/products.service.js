@@ -1,102 +1,50 @@
 import { prisma } from '../utils/prisma.js';
 import { isPubliclyVisible, toAvailabilityLabel, isOfferable, PUBLIC_VISIBLE_STATUSES } from '../utils/productStatus.js';
 import { resolveMediaUrl } from '../utils/media.js';
-import { generateUniqueSlug } from '../utils/slug.js'
+import { generateUniqueSlug } from '../utils/slug.js';
 import { uploadImageBuffer, deleteImage } from './storage.service.js';
 import { ensureArtisanProfile } from './artisans.service.js';
+import { logAudit } from '../utils/audit.js';
 
-const AVAILABILITY_STATUS_MAP = {
-  available: ['PUBLISHED', 'AVAILABLE'],
-  offer_submitted: ['OFFER_PENDING'],
-  sold: ['SOLD'],
-};
-
-const SORT_MAP = {
-  featured: [{ featured: 'desc' }, { createdAt: 'desc' }],
-  newest: [{ createdAt: 'desc' }],
-  price_asc: [{ price: 'asc' }],
-  price_desc: [{ price: 'desc' }],
-};
-
+const AVAILABILITY_STATUS_MAP = { available: ['PUBLISHED', 'AVAILABLE'], offer_submitted: ['OFFER_PENDING'], sold: ['SOLD'] };
+const SORT_MAP = { featured: [{ featured: 'desc' }, { createdAt: 'desc' }], newest: [{ createdAt: 'desc' }], price_asc: [{ price: 'asc' }], price_desc: [{ price: 'desc' }] };
 const BLOCKED_UNPUBLISH_STATUSES = ['OFFER_PENDING', 'OFFER_ACCEPTED', 'RESERVED', 'SOLD'];
 
 function serializeProduct(product, { detail = false } = {}) {
-  const images = [...product.images]
-    .sort((a, b) => a.displayOrder - b.displayOrder)
-    .map((img) => ({
-      id: img.id,
-      altText: img.altText,
-      displayOrder: img.displayOrder,
-      url: resolveMediaUrl(img.mediaAsset),
-    }));
+  const images = [...product.images].sort((a, b) => a.displayOrder - b.displayOrder).map((img) => ({
+    id: img.id, altText: img.altText, displayOrder: img.displayOrder, url: resolveMediaUrl(img.mediaAsset),
+  }));
 
   const base = {
-    id: product.id,
-    name: product.name,
-    slug: product.slug,
-    craft: product.craft,
-    price: product.price ? Number(product.price) : null,
-    currency: product.currency,
-    status: toAvailabilityLabel(product.status),
-    offerable: isOfferable(product.status),
-    featured: product.featured,
-    images,
-    maker:
-      product.makerVisible && product.artisan
-        ? { name: product.artisan.publicDisplayName || null, location: product.artisan.location || null }
-        : null,
+    id: product.id, name: product.name, slug: product.slug, craft: product.craft,
+    price: product.price ? Number(product.price) : null, currency: product.currency,
+    status: toAvailabilityLabel(product.status), offerable: isOfferable(product.status), featured: product.featured, images,
+    maker: product.makerVisible && product.artisan ? { name: product.artisan.publicDisplayName || null, location: product.artisan.location || null } : null,
   };
 
   if (!detail) return base;
 
   return {
-    ...base,
-    description: product.description,
-    story: product.story,
-    material: product.material,
-    technique: product.technique,
-    motif: product.motif,
-    dimensions: product.dimensions,
-    colour: product.colour,
-    makingTimeApprox: product.makingTimeApprox,
-    origin: product.origin,
-    provenance: product.provenance,
-    shippingInfo: product.shippingInfo,
+    ...base, description: product.description, story: product.story, material: product.material, technique: product.technique,
+    motif: product.motif, dimensions: product.dimensions, colour: product.colour, makingTimeApprox: product.makingTimeApprox,
+    origin: product.origin, provenance: product.provenance, shippingInfo: product.shippingInfo,
     reservePrice: product.reservePrice ? Number(product.reservePrice) : null,
   };
 }
 
 function serializeProductForManage(product) {
-  const images = [...product.images]
-    .sort((a, b) => a.displayOrder - b.displayOrder)
-    .map((img) => ({ id: img.id, altText: img.altText, displayOrder: img.displayOrder, url: resolveMediaUrl(img.mediaAsset) }));
+  const images = [...product.images].sort((a, b) => a.displayOrder - b.displayOrder).map((img) => ({
+    id: img.id, altText: img.altText, displayOrder: img.displayOrder, url: resolveMediaUrl(img.mediaAsset),
+  }));
 
   return {
-    id: product.id,
-    name: product.name,
-    slug: product.slug,
-    craft: product.craft,
-    description: product.description,
-    story: product.story,
-    material: product.material,
-    technique: product.technique,
-    motif: product.motif,
-    dimensions: product.dimensions,
-    colour: product.colour,
-    makingTimeApprox: product.makingTimeApprox,
-    origin: product.origin,
-    price: product.price ? Number(product.price) : null,
-    reservePrice: product.reservePrice ? Number(product.reservePrice) : null,
-    currency: product.currency,
-    status: product.status,
-    published: product.published,
-    featured: product.featured,
-    makerVisible: product.makerVisible,
-    provenance: product.provenance,
-    shippingInfo: product.shippingInfo,
-    images,
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
+    id: product.id, name: product.name, slug: product.slug, craft: product.craft, description: product.description,
+    story: product.story, material: product.material, technique: product.technique, motif: product.motif,
+    dimensions: product.dimensions, colour: product.colour, makingTimeApprox: product.makingTimeApprox, origin: product.origin,
+    price: product.price ? Number(product.price) : null, reservePrice: product.reservePrice ? Number(product.reservePrice) : null,
+    currency: product.currency, status: product.status, published: product.published, featured: product.featured,
+    makerVisible: product.makerVisible, provenance: product.provenance, shippingInfo: product.shippingInfo, images,
+    createdAt: product.createdAt, updatedAt: product.updatedAt,
   };
 }
 
@@ -111,11 +59,8 @@ function assertOwnerOrAdmin(product, viewer) {
   return { isAdmin, isOwner };
 }
 
-// ---------- public catalogue ----------
-
 export async function listProducts({ craft, availability, sort = 'featured', page = 1, pageSize = 12, excludeSlug }) {
   const where = { status: { in: PUBLIC_VISIBLE_STATUSES } };
-
   if (craft && ['KASUTI', 'ILKAL'].includes(craft.toUpperCase())) where.craft = craft.toUpperCase();
   if (availability && AVAILABILITY_STATUS_MAP[availability]) where.status = { in: AVAILABILITY_STATUS_MAP[availability] };
   if (excludeSlug) where.slug = { not: excludeSlug };
@@ -139,24 +84,18 @@ export async function getProductBySlug(slug) {
 
 export async function getFeaturedProducts(limit = 3) {
   const items = await prisma.product.findMany({
-    where: { status: { in: PUBLIC_VISIBLE_STATUSES }, featured: true },
-    orderBy: { createdAt: 'desc' },
-    take: limit,
+    where: { status: { in: PUBLIC_VISIBLE_STATUSES }, featured: true }, orderBy: { createdAt: 'desc' }, take: limit,
     include: { images: { include: { mediaAsset: true } }, artisan: true },
   });
   return items.map((p) => serializeProduct(p));
 }
-
-// ---------- artisan: my products ----------
 
 export async function getMyProducts(userId) {
   const artisanProfile = await prisma.artisanProfile.findUnique({ where: { userId } });
   if (!artisanProfile) return [];
 
   const products = await prisma.product.findMany({
-    where: { artisanId: artisanProfile.id },
-    include: { images: { include: { mediaAsset: true } }, offers: true },
-    orderBy: { createdAt: 'desc' },
+    where: { artisanId: artisanProfile.id }, include: { images: { include: { mediaAsset: true } }, offers: true }, orderBy: { createdAt: 'desc' },
   });
 
   return products.map((p) => {
@@ -165,23 +104,13 @@ export async function getMyProducts(userId) {
     const highest = active.reduce((max, o) => Math.max(max, Number(o.currentAmount)), 0);
     const image = [...p.images].sort((a, b) => a.displayOrder - b.displayOrder)[0];
     return {
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      craft: p.craft,
-      price: p.price ? Number(p.price) : null,
-      status: toAvailabilityLabel(p.status),
-      rawStatus: p.status,
-      published: p.published,
+      id: p.id, name: p.name, slug: p.slug, craft: p.craft, price: p.price ? Number(p.price) : null,
+      status: toAvailabilityLabel(p.status), rawStatus: p.status, published: p.published,
       image: image ? { url: resolveMediaUrl(image.mediaAsset), altText: image.altText } : null,
-      offerCount: p.offers.length,
-      pendingCount,
-      highestActiveOffer: active.length ? highest : null,
+      offerCount: p.offers.length, pendingCount, highestActiveOffer: active.length ? highest : null,
     };
   });
 }
-
-// ---------- artisan: create / edit / archive ----------
 
 export async function createProduct(userId, data) {
   const artisanProfile = await ensureArtisanProfile(userId);
@@ -190,29 +119,17 @@ export async function createProduct(userId, data) {
 
   const product = await prisma.product.create({
     data: {
-      name: data.name,
-      slug,
-      craft: data.craft,
-      description: data.description || null,
-      story: data.story || null,
-      material: data.material || null,
-      technique: data.technique || null,
-      motif: data.motif || null,
-      dimensions: data.dimensions || null,
-      colour: data.colour || null,
-      makingTimeApprox: data.makingTimeApprox || null,
-      origin: data.origin || null,
-      price: data.price,
-      reservePrice: data.reservePrice ?? null,
-      provenance: data.provenance || null,
-      shippingInfo: data.shippingInfo || null,
-      makerVisible: data.makerVisible ?? false,
-      published: !!data.published,
-      status,
-      artisanId: artisanProfile.id,
+      name: data.name, slug, craft: data.craft, description: data.description || null, story: data.story || null,
+      material: data.material || null, technique: data.technique || null, motif: data.motif || null,
+      dimensions: data.dimensions || null, colour: data.colour || null, makingTimeApprox: data.makingTimeApprox || null,
+      origin: data.origin || null, price: data.price, reservePrice: data.reservePrice ?? null,
+      provenance: data.provenance || null, shippingInfo: data.shippingInfo || null, makerVisible: data.makerVisible ?? false,
+      published: !!data.published, status, artisanId: artisanProfile.id,
     },
     include: { images: { include: { mediaAsset: true } }, artisan: true },
   });
+
+  await logAudit({ userId, action: 'PRODUCT_CREATED', entityType: 'Product', entityId: product.id, metadata: { name: product.name, status: product.status } });
 
   return serializeProductForManage(product);
 }
@@ -254,15 +171,9 @@ export async function updateProduct(productId, viewer, data) {
 
   if (data.published !== undefined) {
     if (data.published === true) {
-      if (product.status === 'ARCHIVED') {
-        updateData.status = 'DRAFT';
-        updateData.published = false;
-      } else if (product.status === 'DRAFT') {
-        updateData.status = 'PUBLISHED';
-        updateData.published = true;
-      } else {
-        updateData.published = true;
-      }
+      if (product.status === 'ARCHIVED') { updateData.status = 'DRAFT'; updateData.published = false; }
+      else if (product.status === 'DRAFT') { updateData.status = 'PUBLISHED'; updateData.published = true; }
+      else { updateData.published = true; }
     } else {
       if (BLOCKED_UNPUBLISH_STATUSES.includes(product.status)) {
         const err = new Error('This product has active offers or is reserved/sold and cannot be unpublished right now.');
@@ -274,11 +185,14 @@ export async function updateProduct(productId, viewer, data) {
     }
   }
 
-  const updated = await prisma.product.update({
-    where: { id: productId },
-    data: updateData,
-    include: { images: { include: { mediaAsset: true } }, artisan: true },
-  });
+  const updated = await prisma.product.update({ where: { id: productId }, data: updateData, include: { images: { include: { mediaAsset: true } }, artisan: true } });
+
+  if (data.published !== undefined) {
+    await logAudit({
+      userId: viewer.sub, action: updateData.published ? 'PRODUCT_PUBLISHED' : 'PRODUCT_UNPUBLISHED',
+      entityType: 'Product', entityId: productId, metadata: { status: updated.status },
+    });
+  }
 
   return serializeProductForManage(updated);
 }
@@ -300,10 +214,9 @@ export async function archiveProduct(productId, viewer) {
   }
 
   await prisma.product.update({ where: { id: productId }, data: { status: 'ARCHIVED', published: false } });
+  await logAudit({ userId: viewer.sub, action: 'PRODUCT_ARCHIVED', entityType: 'Product', entityId: productId });
   return { archived: true };
 }
-
-// ---------- artisan: images ----------
 
 export async function addProductImage(productId, viewer, file, altText) {
   const product = await prisma.product.findUnique({ where: { id: productId }, include: { artisan: true, images: true } });
@@ -323,14 +236,8 @@ export async function addProductImage(productId, viewer, file, altText) {
 
   const mediaAsset = await prisma.mediaAsset.create({
     data: {
-      originalFilename: file.originalname,
-      storageKey: result.public_id,
-      mimeType: file.mimetype,
-      width: result.width,
-      height: result.height,
-      fileSize: file.size,
-      altText: altText || product.name,
-      uploadStatus: 'UPLOADED',
+      originalFilename: file.originalname, storageKey: result.public_id, mimeType: file.mimetype,
+      width: result.width, height: result.height, fileSize: file.size, altText: altText || product.name, uploadStatus: 'UPLOADED',
     },
   });
 
@@ -362,10 +269,7 @@ export async function updateProductImage(productId, imageId, viewer, data) {
 
   const updated = await prisma.productImage.update({
     where: { id: imageId },
-    data: {
-      ...(data.altText !== undefined ? { altText: data.altText } : {}),
-      ...(data.displayOrder !== undefined ? { displayOrder: data.displayOrder } : {}),
-    },
+    data: { ...(data.altText !== undefined ? { altText: data.altText } : {}), ...(data.displayOrder !== undefined ? { displayOrder: data.displayOrder } : {}) },
     include: { mediaAsset: true },
   });
 
@@ -381,9 +285,7 @@ export async function reorderProductImages(productId, viewer, order) {
   }
   assertOwnerOrAdmin(product, viewer);
 
-  await prisma.$transaction(
-    order.map((imageId, index) => prisma.productImage.updateMany({ where: { id: imageId, productId }, data: { displayOrder: index } }))
-  );
+  await prisma.$transaction(order.map((imageId, index) => prisma.productImage.updateMany({ where: { id: imageId, productId }, data: { displayOrder: index } })));
 
   const images = await prisma.productImage.findMany({ where: { productId }, include: { mediaAsset: true }, orderBy: { displayOrder: 'asc' } });
   return images.map((img) => ({ id: img.id, altText: img.altText, displayOrder: img.displayOrder, url: resolveMediaUrl(img.mediaAsset) }));
@@ -408,9 +310,7 @@ export async function deleteProductImage(productId, imageId, viewer) {
   await prisma.productImage.delete({ where: { id: imageId } });
   await prisma.mediaAsset.delete({ where: { id: image.mediaAssetId } });
 
-  if (image.mediaAsset?.storageKey?.startsWith('craftguard/')) {
-    await deleteImage(image.mediaAsset.storageKey);
-  }
+  if (image.mediaAsset?.storageKey?.startsWith('craftguard/')) await deleteImage(image.mediaAsset.storageKey);
 
   return { deleted: true };
 }

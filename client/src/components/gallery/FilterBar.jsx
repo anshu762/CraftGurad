@@ -17,7 +17,7 @@ export default function FilterBar({ filters, onChange }) {
           <div className="flex gap-2" role="group" aria-label="Filter by craft">
             {CRAFTS.map((c) => (
               <button key={c.value} onClick={() => update('craft', c.value)} aria-pressed={filters.craft === c.value}
-                className={`px-4 py-2 text-sm border rounded-sm transition-colors ${filters.craft === c.value ? 'bg-charcoal text-cream border-charcoal' : 'border-line hover:border-charcoal'}`}>
+                className={`px-4 py-2 text-sm border rounded-xl transition-colors ${filters.craft === c.value ? 'bg-charcoal text-cream border-charcoal' : 'border-line hover:border-charcoal'}`}>
                 {c.label}
               </button>
             ))}
@@ -29,7 +29,7 @@ export default function FilterBar({ filters, onChange }) {
           <div className="flex gap-2" role="group" aria-label="Filter by availability">
             {AVAILABILITY.map((a) => (
               <button key={a.value} onClick={() => update('availability', a.value)} aria-pressed={filters.availability === a.value}
-                className={`px-4 py-2 text-sm border rounded-sm transition-colors ${filters.availability === a.value ? 'bg-charcoal text-cream border-charcoal' : 'border-line hover:border-charcoal'}`}>
+                className={`px-4 py-2 text-sm border rounded-xl transition-colors ${filters.availability === a.value ? 'bg-charcoal text-cream border-charcoal' : 'border-line hover:border-charcoal'}`}>
                 {a.label}
               </button>
             ))}
@@ -38,7 +38,7 @@ export default function FilterBar({ filters, onChange }) {
 
         <div>
           <label htmlFor="sort-select" className="eyebrow mb-2 block">Sort by</label>
-          <select id="sort-select" value={filters.sort} onChange={(e) => update('sort', e.target.value)} className="border border-line px-4 py-2 text-sm rounded-sm bg-paper">
+          <select id="sort-select" value={filters.sort} onChange={(e) => update('sort', e.target.value)} className="border border-line px-4 py-2 text-sm rounded-xl bg-paper">
             {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
           </select>
         </div>

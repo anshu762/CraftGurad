@@ -15,7 +15,7 @@ export default function GalleryItem({ product, featured = false }) {
           theme={theme}
           label={image?.altText}
           aspect={featured ? '1/1' : '4/5'}
-          className="transition-transform duration-700 group-hover:scale-105"
+          className="transition-transform duration-700 rounded-xl group-hover:scale-105"
         />
       </div>
       <div className="flex items-start justify-between gap-3">

@@ -69,7 +69,7 @@ export default function ProductsPanel() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <p className="eyebrow">My Products</p>
-        <button onClick={openCreate} className="bg-charcoal text-cream px-5 py-2 text-xs uppercase tracking-wide hover:bg-terracotta transition-colors rounded-sm">
+        <button onClick={openCreate} className="bg-charcoal text-cream px-5 py-2 text-xs uppercase tracking-wide hover:bg-terracotta transition-colors rounded-xl">
           + New Product
         </button>
       </div>
@@ -83,8 +83,8 @@ export default function ProductsPanel() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {items.map((p) => (
-            <div key={p.id} className="border border-line rounded-sm p-4">
-              <div className="aspect-[4/5] bg-line/30 mb-3 overflow-hidden rounded-sm">
+            <div key={p.id} className="border border-line rounded-xl p-4">
+              <div className="aspect-[4/5] bg-line/30 mb-3 overflow-hidden rounded-xl">
                 {p.image?.url ? <img src={p.image.url} alt={p.image.altText} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-xs text-mute">No photo yet</div>}
               </div>
               <p className="font-serif">{p.name}</p>
@@ -94,16 +94,16 @@ export default function ProductsPanel() {
                 {p.offerCount > 0 ? `${p.offerCount} offer${p.offerCount === 1 ? '' : 's'}${p.pendingCount > 0 ? ` · ${p.pendingCount} awaiting you` : ''}` : 'No offers yet'}
               </p>
               <div className="flex flex-wrap gap-2">
-                <button onClick={() => openEdit(p.id)} className="border border-charcoal px-3 py-1.5 text-xs uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors rounded-sm">
+                <button onClick={() => openEdit(p.id)} className="border border-charcoal px-3 py-1.5 text-xs uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors rounded-xl">
                   Edit
                 </button>
                 {!['SOLD', 'ARCHIVED'].includes(p.rawStatus) && (
-                  <button onClick={() => handleQuickToggle(p)} className="border border-charcoal px-3 py-1.5 text-xs uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors rounded-sm">
+                  <button onClick={() => handleQuickToggle(p)} className="border border-charcoal px-3 py-1.5 text-xs uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors rounded-xl">
                     {p.published ? 'Unpublish' : 'Publish'}
                   </button>
                 )}
                 {p.rawStatus !== 'ARCHIVED' && (
-                  <button onClick={() => handleArchive(p)} className="border border-terracotta text-terracotta px-3 py-1.5 text-xs uppercase tracking-wide hover:bg-terracotta hover:text-cream transition-colors rounded-sm">
+                  <button onClick={() => handleArchive(p)} className="border border-terracotta text-terracotta px-3 py-1.5 text-xs uppercase tracking-wide hover:bg-terracotta hover:text-cream transition-colors rounded-xl">
                     Archive
                   </button>
                 )}

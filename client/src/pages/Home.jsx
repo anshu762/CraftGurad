@@ -201,6 +201,8 @@ export default function Home() {
         ctaLink="/gallery"
         variant="dark"
       />
+
+      <hr  className="border-white/75 border-2" />
     </div>
   );
 }

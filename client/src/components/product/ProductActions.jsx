@@ -14,7 +14,7 @@ export default function ProductActions({ product }) {
 
   if (!product.offerable) {
     return (
-      <div className="border border-line rounded-sm px-5 py-4 text-sm text-mute">
+      <div className="border border-line rounded-xl px-5 py-4 text-sm text-mute">
         This piece is {product.status.toLowerCase()} and is no longer open to offers.
       </div>
     );
@@ -61,14 +61,14 @@ export default function ProductActions({ product }) {
       <button
         onClick={handleAddToCart}
         disabled={adding}
-        className="flex-1 border border-charcoal px-6 py-3 text-sm uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors rounded-sm disabled:opacity-60"
+        className="flex-1 border border-charcoal px-6 py-3 text-sm uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors rounded-xl disabled:opacity-60"
       >
         {alreadyInCart ? 'View in Cart ✓' : adding ? 'Adding…' : 'Add to Cart'}
       </button>
       <button
         onClick={handleMakeOffer}
         disabled={adding}
-        className="flex-1 bg-charcoal text-cream px-6 py-3 text-sm uppercase tracking-wide hover:bg-terracotta transition-colors rounded-sm disabled:opacity-60"
+        className="flex-1 bg-charcoal text-cream px-6 py-3 text-sm uppercase tracking-wide hover:bg-terracotta transition-colors rounded-xl disabled:opacity-60"
       >
         Make an Offer
       </button>

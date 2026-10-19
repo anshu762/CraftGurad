@@ -42,7 +42,7 @@ export default function OfferManagementPanel({ offers, onChange }) {
         const expanded = expandedId === offer.id;
         const isCountering = counteringId === offer.id;
         return (
-          <div key={offer.id} className="border border-line rounded-sm p-5">
+          <div key={offer.id} className="border border-line rounded-lg p-5">
             {offer.product && <p className="text-xs text-mute mb-1">{offer.product.name}</p>}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
               <div>

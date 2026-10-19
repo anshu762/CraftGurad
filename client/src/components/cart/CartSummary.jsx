@@ -6,7 +6,7 @@ export default function CartSummary({ items, onSubmit }) {
   const readyCount = offerableItems.filter((i) => i.draftAmount).length;
 
   return (
-    <div className="border border-line rounded-sm p-6 lg:sticky lg:top-24">
+    <div className="border border-line rounded-xl p-6 lg:sticky lg:top-24">
       <p className="eyebrow mb-4">Summary</p>
       <div className="flex justify-between text-sm mb-2">
         <span className="text-mute">Items in cart</span>
@@ -23,7 +23,7 @@ export default function CartSummary({ items, onSubmit }) {
       <button
         onClick={onSubmit}
         disabled={offerableItems.length === 0}
-        className="w-full bg-charcoal text-cream py-3 text-sm uppercase tracking-wide hover:bg-terracotta transition-colors disabled:opacity-50 rounded-sm"
+        className="w-full bg-charcoal text-cream py-3 text-sm uppercase tracking-wide hover:bg-terracotta transition-colors disabled:opacity-50 rounded-xl"
       >
         Review &amp; Submit Offers
       </button>

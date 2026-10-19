@@ -65,7 +65,7 @@ function OffersTab() {
           <button
             key={p.id}
             onClick={() => setSelectedSlug(p.slug)}
-            className={`w-full text-left border rounded-sm p-4 transition-colors ${selectedSlug === p.slug ? 'border-terracotta bg-terracotta/5' : 'border-line hover:border-charcoal'}`}
+            className={`w-full text-left border rounded-lg p-4 transition-colors ${selectedSlug === p.slug ? 'border-terracotta bg-terracotta/5' : 'border-line hover:border-charcoal'}`}
           >
             <p className="font-serif">{p.name}</p>
             <p className="text-xs text-mute mt-1">{p.status}</p>

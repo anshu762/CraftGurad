@@ -22,7 +22,7 @@ export default function Account() {
     <div className="max-w-2xl mx-auto px-5 md:px-8 py-20 md:py-28">
       <p className="eyebrow mb-4">My Account</p>
       <h1 className="text-3xl md:text-4xl mb-8">Welcome, {user.name}</h1>
-      <div className="border border-line rounded-sm p-6 mb-8 space-y-3">
+      <div className="border border-line rounded-xl p-6 mb-8 space-y-3">
         <p><span className="text-mute">Email:</span> {user.email}</p>
         {user.phone && <p><span className="text-mute">Phone:</span> {user.phone}</p>}
         <p><span className="text-mute">Role:</span> {user.role}</p>
@@ -42,7 +42,7 @@ export default function Account() {
             <Link
               key={offer.id}
               to={`/product/${offer.product.slug}`}
-              className="block border border-line rounded-sm p-4 hover:border-terracotta transition-colors"
+              className="block border border-line rounded-xl p-4 hover:border-terracotta transition-colors"
             >
               <div className="flex items-center justify-between mb-2 gap-3">
                 <span className="font-serif truncate">{offer.product.name}</span>
@@ -57,7 +57,7 @@ export default function Account() {
         </div>
       )}
 
-      <button onClick={handleLogout} className="border border-charcoal px-6 py-3 text-sm uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors">
+      <button onClick={handleLogout} className="border border-charcoal rounded-xl px-6 py-3 text-sm uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors">
         Log Out
       </button>
     </div>

@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout.jsx';
+import ScrollToTop from './components/layout/ScrollToTop.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
@@ -32,6 +33,7 @@ export default function App() {
     <AuthProvider>
       <ToastProvider>
         <CartProvider>
+          <ScrollToTop />
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />

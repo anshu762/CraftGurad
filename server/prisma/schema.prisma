@@ -70,6 +70,8 @@ model User {
   artisanProfile ArtisanProfile?
   auditLogs      AuditLog[]
   offerEvents    OfferEvent[]
+  offersPlaced   Offer[]          // NEW — Phase 9
+  notifications  Notification[]   // NEW — Phase 9
   cart           Cart?            // NEW
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
@@ -243,6 +245,8 @@ model Offer {
   id               String       @id @default(cuid())
   product          Product      @relation(fields: [productId], references: [id])
   productId        String
+  buyerId          String?                                    // NEW — Phase 9
+  buyer            User?        @relation(fields: [buyerId], references: [id])   // NEW — Phase 9
   buyerName        String
   buyerEmail       String
   buyerPhone       String
@@ -261,6 +265,7 @@ model Offer {
 
   @@index([productId, status])
   @@index([createdAt])
+  @@index([buyerId])
 }
 
 model OfferEvent {
@@ -278,11 +283,19 @@ model OfferEvent {
 
 model Notification {
   id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
   type      String
-  recipient String
+  title     String
+  message   String
+  link      String?
   payload   Json?
-  sentAt    DateTime?
+  read      Boolean   @default(false)
+  readAt    DateTime?
   createdAt DateTime  @default(now())
+
+  @@index([userId, read])
+  @@index([createdAt])
 }
 
 model AuditLog {

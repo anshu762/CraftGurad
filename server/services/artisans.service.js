@@ -1,6 +1,7 @@
 import { prisma } from '../utils/prisma.js';
 import { resolveMediaUrl } from '../utils/media.js';
 import { uploadImageBuffer, deleteImage } from './storage.service.js';
+import { logAudit } from '../utils/audit.js';
 
 export async function ensureArtisanProfile(userId) {
   let profile = await prisma.artisanProfile.findUnique({ where: { userId } });
@@ -13,36 +14,21 @@ export async function ensureArtisanProfile(userId) {
 
 function serializeProfile(profile) {
   return {
-    id: profile.id,
-    publicDisplayName: profile.publicDisplayName,
-    location: profile.location,
-    biography: profile.biography,
+    id: profile.id, publicDisplayName: profile.publicDisplayName, location: profile.location, biography: profile.biography,
     craftAssociation: profile.craftAssociation,
-    portrait: profile.portraitAsset
-      ? { url: resolveMediaUrl(profile.portraitAsset), altText: profile.portraitAsset.altText }
-      : null,
-    profileVisibility: profile.profileVisibility,
-    contactVisibility: profile.contactVisibility,
-    consentStatus: profile.consentStatus,
+    portrait: profile.portraitAsset ? { url: resolveMediaUrl(profile.portraitAsset), altText: profile.portraitAsset.altText } : null,
+    profileVisibility: profile.profileVisibility, contactVisibility: profile.contactVisibility, consentStatus: profile.consentStatus,
     consentRecords: (profile.consentRecords || []).map((c) => ({
-      id: c.id,
-      consentType: c.consentType,
-      status: c.status,
-      consentDate: c.consentDate,
-      expiryDate: c.expiryDate,
-      notes: c.notes,
-      createdAt: c.createdAt,
+      id: c.id, consentType: c.consentType, status: c.status, consentDate: c.consentDate, expiryDate: c.expiryDate, notes: c.notes, createdAt: c.createdAt,
     })),
-    createdAt: profile.createdAt,
-    updatedAt: profile.updatedAt,
+    createdAt: profile.createdAt, updatedAt: profile.updatedAt,
   };
 }
 
 export async function getMyProfile(userId) {
   await ensureArtisanProfile(userId);
   const profile = await prisma.artisanProfile.findUnique({
-    where: { userId },
-    include: { portraitAsset: true, consentRecords: { orderBy: { createdAt: 'desc' } } },
+    where: { userId }, include: { portraitAsset: true, consentRecords: { orderBy: { createdAt: 'desc' } } },
   });
   return serializeProfile(profile);
 }
@@ -70,15 +56,9 @@ export async function uploadMyPortrait(userId, file) {
 
   const mediaAsset = await prisma.mediaAsset.create({
     data: {
-      originalFilename: file.originalname,
-      storageKey: result.public_id,
-      mimeType: file.mimetype,
-      width: result.width,
-      height: result.height,
-      fileSize: file.size,
-      altText: `Portrait of ${profile.publicDisplayName || 'the artisan'}`,
-      consentRequired: true,
-      uploadStatus: 'UPLOADED',
+      originalFilename: file.originalname, storageKey: result.public_id, mimeType: file.mimetype,
+      width: result.width, height: result.height, fileSize: file.size,
+      altText: `Portrait of ${profile.publicDisplayName || 'the artisan'}`, consentRequired: true, uploadStatus: 'UPLOADED',
     },
   });
 
@@ -89,14 +69,12 @@ export async function uploadMyPortrait(userId, file) {
 
   await prisma.artisanProfile.update({ where: { userId }, data: { portraitAssetId: mediaAsset.id } });
 
-  const existingConsent = await prisma.consentRecord.findFirst({
-    where: { artisanId: profile.id, consentType: 'PORTRAIT', status: { in: ['PENDING', 'GRANTED'] } },
-  });
+  const existingConsent = await prisma.consentRecord.findFirst({ where: { artisanId: profile.id, consentType: 'PORTRAIT', status: { in: ['PENDING', 'GRANTED'] } } });
   if (!existingConsent) {
-    await prisma.consentRecord.create({
-      data: { artisanId: profile.id, mediaAssetId: mediaAsset.id, consentType: 'PORTRAIT', status: 'PENDING' },
-    });
+    await prisma.consentRecord.create({ data: { artisanId: profile.id, mediaAssetId: mediaAsset.id, consentType: 'PORTRAIT', status: 'PENDING' } });
   }
+
+  await logAudit({ userId, action: 'PORTRAIT_UPLOADED', entityType: 'ArtisanProfile', entityId: profile.id, metadata: { mediaAssetId: mediaAsset.id } });
 
   return getMyProfile(userId);
 }
@@ -111,11 +89,12 @@ export async function requestConsent(userId, consentType) {
   }
   const profile = await ensureArtisanProfile(userId);
 
-  const existing = await prisma.consentRecord.findFirst({
-    where: { artisanId: profile.id, consentType, status: { in: ['PENDING', 'GRANTED'] } },
-  });
+  const existing = await prisma.consentRecord.findFirst({ where: { artisanId: profile.id, consentType, status: { in: ['PENDING', 'GRANTED'] } } });
   if (!existing) {
     await prisma.consentRecord.create({ data: { artisanId: profile.id, consentType, status: 'PENDING' } });
   }
+
+  await logAudit({ userId, action: 'CONSENT_REQUESTED', entityType: 'ConsentRecord', entityId: profile.id, metadata: { consentType } });
+
   return getMyProfile(userId);
 }

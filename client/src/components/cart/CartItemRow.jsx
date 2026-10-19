@@ -80,7 +80,7 @@ export default function CartItemRow({ item }) {
               disabled={!item.product.offerable}
               onChange={(e) => setAmount(e.target.value)}
               onBlur={handleBlur}
-              className="w-full border border-line px-3 py-2 text-sm rounded-sm bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta disabled:opacity-50"
+              className="w-full border border-line px-3 py-2 text-sm rounded-xl bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta disabled:opacity-50"
               placeholder="e.g. 8000"
             />
             {saving && <span className="text-xs text-mute flex-shrink-0">Saving…</span>}

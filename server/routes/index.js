@@ -6,6 +6,7 @@ import cartRoutes from './cart.routes.js';
 import offerRoutes from './offers.routes.js';
 import adminRoutes from './admin.routes.js';
 import artisanRoutes from './artisans.routes.js';
+import notificationRoutes from './notifications.routes.js'
 
 const router = Router();
 router.use('/health', health);
@@ -15,5 +16,6 @@ router.use('/cart', cartRoutes);
 router.use('/offers', offerRoutes);
 router.use('/admin', adminRoutes);
 router.use('/artisans', artisanRoutes);
+router.use('/notifications', notificationRoutes);
 
 export default router;

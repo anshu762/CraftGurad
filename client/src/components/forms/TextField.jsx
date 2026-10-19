@@ -19,7 +19,7 @@ export default function TextField({ label, type = 'text', value, onChange, error
         autoComplete={autoComplete}
         aria-invalid={!!error}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full border px-4 py-3 bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta rounded-sm ${
+        className={`w-full border px-4 py-3 bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta rounded-xl ${
           error ? 'border-terracotta' : 'border-line'
         }`}
       />

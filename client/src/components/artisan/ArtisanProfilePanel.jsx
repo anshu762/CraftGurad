@@ -88,28 +88,28 @@ export default function ArtisanProfilePanel() {
           <div>
             <label className="block text-xs text-mute mb-1">Public display name</label>
             <input value={current.publicDisplayName} onChange={(e) => update('publicDisplayName', e.target.value)}
-              className="w-full border border-line px-3 py-2 text-sm rounded-sm bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta" />
+              className="w-full border border-line px-3 py-2 text-sm rounded-xl bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta" />
           </div>
           <div>
             <label className="block text-xs text-mute mb-1">Location</label>
             <input value={current.location} onChange={(e) => update('location', e.target.value)}
-              className="w-full border border-line px-3 py-2 text-sm rounded-sm bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta" />
+              className="w-full border border-line px-3 py-2 text-sm rounded-xl bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta" />
           </div>
           <div>
             <label className="block text-xs text-mute mb-1">Biography</label>
             <textarea rows={4} value={current.biography} onChange={(e) => update('biography', e.target.value)}
-              className="w-full border border-line px-3 py-2 text-sm rounded-sm bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta" />
+              className="w-full border border-line px-3 py-2 text-sm rounded-xl bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta" />
           </div>
           <div>
             <label className="block text-xs text-mute mb-1">Craft association</label>
             <select value={current.craftAssociation} onChange={(e) => update('craftAssociation', e.target.value)}
-              className="w-full border border-line px-3 py-2 text-sm rounded-sm bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta">
+              className="w-full border border-line px-3 py-2 text-sm rounded-xl bg-paper focus:outline-none focus:ring-2 focus:ring-terracotta">
               <option value="">None</option>
               <option value="KASUTI">Kasuti</option>
               <option value="ILKAL">Ilkal</option>
             </select>
           </div>
-          <button type="submit" disabled={saving} className="bg-charcoal text-cream px-5 py-3 text-sm uppercase tracking-wide hover:bg-terracotta transition-colors rounded-sm disabled:opacity-60">
+          <button type="submit" disabled={saving} className="bg-charcoal text-cream px-5 py-3 text-sm uppercase tracking-wide hover:bg-terracotta transition-colors rounded-xl disabled:opacity-60">
             {saving ? 'Saving…' : 'Save Profile'}
           </button>
         </form>
@@ -123,7 +123,7 @@ export default function ArtisanProfilePanel() {
           </div>
           <form onSubmit={handlePortraitUpload} className="flex-1 space-y-2">
             <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setPortraitFile(e.target.files?.[0] || null)} className="text-sm block" />
-            <button type="submit" disabled={uploadingPortrait} className="border border-charcoal px-4 py-2 text-xs uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors rounded-sm disabled:opacity-60">
+            <button type="submit" disabled={uploadingPortrait} className="border border-charcoal px-4 py-2 text-xs uppercase tracking-wide hover:bg-charcoal hover:text-cream transition-colors rounded-xl disabled:opacity-60">
               {uploadingPortrait ? 'Uploading…' : 'Upload Portrait'}
             </button>
           </form>
@@ -136,10 +136,10 @@ export default function ArtisanProfilePanel() {
           Your profile visibility and contact visibility are reviewed and managed by CraftGuard's editorial team to protect your identity and story. You can request consent review for each category below.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 text-sm">
-          <div className="border border-line rounded-sm p-3">
+          <div className="border border-line rounded-xl p-3">
             <span className="text-mute">Profile visible publicly:</span> {profile.profileVisibility ? 'Yes' : 'Not yet'}
           </div>
-          <div className="border border-line rounded-sm p-3">
+          <div className="border border-line rounded-xl p-3">
             <span className="text-mute">Contact details visible:</span> {profile.contactVisibility ? 'Yes' : 'Not yet'}
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function ArtisanProfilePanel() {
           {CONSENT_TYPES.map(({ key, label }) => {
             const record = latestByType[key];
             return (
-              <div key={key} className="flex items-center justify-between border border-line rounded-sm p-3">
+              <div key={key} className="flex items-center justify-between border border-line rounded-xl p-3">
                 <span className="text-sm">{label}</span>
                 {record ? (
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide ${CONSENT_STYLES[record.status] || 'bg-gray-100 text-gray-700'}`}>
