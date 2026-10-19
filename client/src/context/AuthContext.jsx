@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
       setUser(data.user);
     } catch {
       setUser(null);
+      apiClient.clearToken();
     } finally {
       setLoading(false);
     }
@@ -22,19 +23,25 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const data = await apiClient.post('/auth/login', { email, password });
+    apiClient.setToken(data.token);
     setUser(data.user);
     return data.user;
   }, []);
 
   const register = useCallback(async (payload) => {
     const data = await apiClient.post('/auth/register', payload);
+    apiClient.setToken(data.token);
     setUser(data.user);
     return data.user;
   }, []);
 
   const logout = useCallback(async () => {
-    await apiClient.post('/auth/logout');
-    setUser(null);
+    try {
+      await apiClient.post('/auth/logout');
+    } finally {
+      apiClient.clearToken();
+      setUser(null);
+    }
   }, []);
 
   return (

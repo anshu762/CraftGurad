@@ -3,15 +3,27 @@ import { createUser, verifyCredentials, signToken, toPublicUser, getUserById } f
 
 const COOKIE_NAME = process.env.COOKIE_NAME || 'cg_session';
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-function setAuthCookie(res, token) {
-  res.cookie(COOKIE_NAME, token, {
+/**
+ * Cookie is now a secondary/best-effort mechanism only (same-origin
+ * convenience, local dev). The actual cross-origin session is carried by the
+ * Authorization header, returned in the JSON body below and stored by the
+ * frontend — so SameSite/secure values here no longer matter for whether
+ * auth works.
+ */
+function cookieOptions() {
+  return {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: IS_PRODUCTION ? 'none' : 'lax',
+    secure: IS_PRODUCTION,
     maxAge: COOKIE_MAX_AGE,
     path: '/',
-  });
+  };
+}
+
+function setAuthCookie(res, token) {
+  res.cookie(COOKIE_NAME, token, cookieOptions());
 }
 
 export async function register(req, res, next) {
@@ -23,7 +35,7 @@ export async function register(req, res, next) {
     const user = await createUser(parsed.data);
     const token = signToken(user);
     setAuthCookie(res, token);
-    res.status(201).json({ user: toPublicUser(user) });
+    res.status(201).json({ user: toPublicUser(user), token });
   } catch (err) {
     next(err);
   }
@@ -38,14 +50,14 @@ export async function login(req, res, next) {
     const user = await verifyCredentials(parsed.data.email, parsed.data.password);
     const token = signToken(user);
     setAuthCookie(res, token);
-    res.json({ user: toPublicUser(user) });
+    res.json({ user: toPublicUser(user), token });
   } catch (err) {
     next(err);
   }
 }
 
 export function logout(req, res) {
-  res.clearCookie(COOKIE_NAME, { path: '/' });
+  res.clearCookie(COOKIE_NAME, cookieOptions());
   res.json({ message: 'Logged out successfully.' });
 }
 
