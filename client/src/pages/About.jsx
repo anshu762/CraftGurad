@@ -50,7 +50,7 @@ export default function About() {
 
       <PullQuote
         quote="Documentation without consent isn't preservation — it's extraction. We chose the harder, slower path."
-        attribution="CraftGuard project team"
+        attribution="Dhruti Rajiv Founder of CraftGuard "
       />
 
       <EditorialSection

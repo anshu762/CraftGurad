@@ -39,6 +39,6 @@ export const IMAGES = {
 
   // ---------- About page ----------
   aboutDocumentary: { src: '/images/about/documentary.webp', alt: 'Documentary photography session in a Karnataka workshop', theme: 'neutral', label: 'Documentary photograph pending' },
-  aboutDhruti: { src: '/images/about/dhruti.jpg', alt: "Dhruti photographing an artisan's workspace", theme: 'neutral', label: 'Photographer photograph pending' },
+  aboutDhruti: { src: '/images/about/dhruti.webp', alt: "Dhruti photographing an artisan's workspace", theme: 'neutral', label: 'Photographer photograph pending' },
   aboutConsent: { src: '/images/about/consent.webp', alt: 'Artisan reviewing a consent document', theme: 'neutral', label: 'Consent process photograph pending' },
 };
