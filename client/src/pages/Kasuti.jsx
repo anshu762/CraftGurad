@@ -30,7 +30,7 @@ export default function Kasuti() {
       <EditorialSection
         variant="full-bleed"
         image={IMAGES.kasutiOpening}
-        caption="Kasuti work in progress on handwoven cotton. Photograph credit pending."
+        caption="Kasuti work in progress on handwoven cotton."
       />
 
       <StorySection

@@ -7,16 +7,16 @@
 export const IMAGES = {
   // ---------- Homepage ----------
   heroMain: { src: '/images/home/hero-main.webp', alt: "A Kasuti artisan's hands mid-stitch on red cotton fabric, workshop light", theme: 'kasuti', label: 'Hero photograph pending' },
-  documentaryWide1: { src: '/images/home/documentary-wide-1.webp', alt: 'Wide documentary shot of a weaving workshop with natural light', theme: 'ilkal', label: 'Documentary photograph pending' },
+  documentaryWide1: { src: '/images/home/documentary-wide-1.jpeg', alt: 'Wide documentary shot of a weaving workshop with natural light', theme: 'ilkal', label: 'Documentary photograph pending' },
   kasutiIlkalIntro: { src: '/images/home/kasuti-ilkal-intro.webp', alt: 'Side by side texture of Kasuti embroidery and Ilkal weave', theme: 'neutral', label: 'Texture photograph pending' },
-  artisanPortrait1: { src: '/images/home/artisan-portrait-1.webp', alt: 'Artisan at work, portrait withheld pending consent', theme: 'kasuti', label: 'Portrait pending consent + photography' },
+  artisanPortrait1: { src: '/images/home/artisan-portrait-1.jpeg', alt: 'Artisan at work, portrait withheld pending consent', theme: 'kasuti', label: 'Portrait pending consent + photography' },
   kasutiTeaser: { src: '/images/home/kasuti-teaser.jpeg', alt: 'Kasuti embroidery craft preview', theme: 'kasuti', label: 'Kasuti — photograph pending' },
   ilkalTeaser: { src: '/images/home/ilkal-teaser.jpeg', alt: 'Ilkal weaving craft preview', theme: 'ilkal', label: 'Ilkal — photograph pending' },
   kasutiProcess: { src: '/images/home/kasuti-process.jpeg', alt: 'Close-up of Kasuti embroidery stitching in progress', theme: 'kasuti', label: 'Process photograph pending' },
   ilkalProcess: { src: '/images/home/ilkal-process.jpeg', alt: "Weaver's hands working an Ilkal saree on a traditional loom", theme: 'ilkal', label: 'Process photograph pending' },
 
   // ---------- Kasuti story page ----------
-  kasutiOpening: { src: '/images/kasuti/opening.webp', alt: 'Kasuti work in progress on handwoven cotton', theme: 'kasuti', label: 'Opening photograph pending' },
+  kasutiOpening: { src: '/images/kasuti/opening.jpeg', alt: 'Kasuti work in progress on handwoven cotton', theme: 'kasuti', label: 'Opening photograph pending' },
   kasutiOrigin: { src: '/images/kasuti/origin.jpeg', alt: 'Traditional Kasuti motifs on fabric', theme: 'kasuti', label: 'Origin photograph pending' },
   kasutiMaking1: { src: '/images/kasuti/making-1.jpeg', alt: 'Close-up of Kasuti stitching technique, side one', theme: 'kasuti', label: 'Process photograph pending', caption: 'Counting threads before each stitch.' },
   kasutiMaking2: { src: '/images/kasuti/making-2.webp', alt: 'Close-up of Kasuti stitching technique, side two', theme: 'kasuti', label: 'Process photograph pending', caption: 'A completed motif section.' },

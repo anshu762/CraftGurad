@@ -30,7 +30,7 @@ export default function Ilkal() {
       <EditorialSection
         variant="full-bleed"
         image={IMAGES.ilkalOpening}
-        caption="An Ilkal saree on the loom, mid-weave. Photograph credit pending."
+        caption="An Ilkal saree on the loom, mid-weave."
       />
 
       <StorySection
